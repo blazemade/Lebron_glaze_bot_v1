@@ -2,7 +2,7 @@ import requests
 import random
 import uuid
 
-# Simulated endpoint — replace with your own test API
+#replace this wit the dude wholl get bronned
 url = 'https://ngl.link/api/submit'
 
 # LeBron praise-style questions
