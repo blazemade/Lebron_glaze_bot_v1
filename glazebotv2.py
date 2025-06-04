@@ -1,9 +1,9 @@
 import requests
 import uuid
 import random
+import threading
 import time
 
-# LeBron glaze messeges (you can change em dw)
 questions = [
     "LeBron could drop 50 in flip-flops and a blindfold.",
     "MJ walked so LeBron could fly.",
@@ -64,65 +64,123 @@ questions = [
     "He’s the reason basketballs are still round.",
     "LeBron's locker is considered a shrine by historians.",
     "When LeBron rests, the universe reboots.",
-    "LeBron once turned a turnover into a TED Talk."
+    "LeBron once turned a turnover into a TED Talk.",
+    "LeBron’s dribble has its own gravitational field.",
+    "LeBron once signed a sneaker deal mid fast-break.",
+    "If LeBron was in the Matrix, he'd dunk in bullet time.",
+    "LeBron sees X’s and O’s in real life.",
+    "LeBron’s jersey number should be pi — never-ending.",
+    "LeBron could outscore a team with one hand tied.",
+    "LeBron blinked and a dynasty formed.",
+    "Even his sweatbands average 10 assists.",
+    "LeBron once challenged gravity to 1v1 — and won.",
+    "Every time LeBron breathes, a stat is born.",
+    "LeBron once taught a referee the rulebook mid-game.",
+    "LeBron doesn’t play the game — he rewrites it.",
+    "His shadow blocks shots.",
+    "Even mirrors reflect his clutch gene.",
+    "LeBron’s sneaker squeak breaks ankles.",
+    "The court becomes sacred when LeBron steps on it.",
+    "LeBron scored 30 in a scrimmage against fate.",
+    "Defenses draw straws to guard him.",
+    "LeBron’s layup package is DLC in real life.",
+    "He signs contracts with exclamation marks — not pens."
 ]
 
-device_id = str(uuid.uuid4())
-headers = {
-    "User-Agent": "Mozilla/5.0",
-    "Content-Type": "application/x-www-form-urlencoded"
-}
+user_agents = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X)",
+    "Mozilla/5.0 (Linux; Android 11; SM-G991B)",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
+    "Mozilla/5.0 (X11; Linux x86_64)"
+]
 
-# placeholder target
+try:
+    with open("proxies.txt") as f:
+        proxies = [line.strip() for line in f if line.strip()]
+except:
+    proxies = [None]
+
 current_target = "demo_user"
+use_proxies = True
 
-def send_message(username):
+def send_message(username, proxy=None):
     question = random.choice(questions)
     data = {
         "username": username,
         "question": question,
-        "deviceId": device_id,
+        "deviceId": str(uuid.uuid4()),
         "referrer": "https://snapchat.com"
     }
+    headers = {
+        "User-Agent": random.choice(user_agents),
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+
+    proxy_dict = {
+        "http": proxy,
+        "https": proxy
+    } if proxy else None
+
     try:
-        res = requests.post("https://ngl.link/api/submit", data=data, headers=headers)
-        print(f"✅ Sent to @{username}: {question} | Status: {res.status_code}")
+        res = requests.post("https://ngl.link/api/submit", data=data, headers=headers, proxies=proxy_dict, timeout=8)
+        print(f" Sent to @{username}: {question} | Status: {res.status_code} | Proxy: {proxy or 'local'}")
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f" Error ({proxy or 'local'}): {e}")
 
 print("🟢 LeBron Glaze Bot Started")
-print("Type 'send' to send one message")
-print("Type 'auto' to loop")
-print("Type 'target' to change who you're sending to")
-print("Type 'exit' to quit")
+print("Commands: send | auto | threaded | target | proxy | exit")
 
 while True:
-    cmd = input("👉 Command: ").strip().lower()
+    cmd = input("Command: ").strip().lower()
 
     if cmd == "send":
-        send_message(current_target)
-#change time.sleep if you want to change time, default is 5
+        proxy = random.choice(proxies) if use_proxies else None
+        send_message(current_target, proxy)
+
     elif cmd == "auto":
-        print(f"🔁 Auto-sending to @{current_target} every 5s. Ctrl+C to stop.")
+        print(f" Auto-sending to @{current_target} every 2s. Ctrl+C to stop. Proxies: {'ON' if use_proxies else 'OFF'}")
         try:
             while True:
-                send_message(current_target)
-                time.sleep(5)
+                proxy = random.choice(proxies) if use_proxies else None
+                send_message(current_target, proxy)
+                time.sleep(2)
         except KeyboardInterrupt:
-            print("\n⛔ Auto-send stopped.")
+            print("\n Auto-send stopped.")
+
+    elif cmd == "threaded":
+        try:
+            count = int(input(" Threads? "))
+            def worker():
+                proxy = random.choice(proxies) if use_proxies else None
+                send_message(current_target, proxy)
+                time.sleep(random.uniform(1, 4))
+            threads = []
+            for _ in range(count):
+                t = threading.Thread(target=worker)
+                t.start()
+                threads.append(t)
+            for t in threads:
+                t.join()
+        except:
+            print(" Invalid input.")
 
     elif cmd == "target":
-        new_target = input("🎯 Enter new target username (no @): ").strip()
+        new_target = input(" Enter new target username (no @): ").strip()
         if new_target:
             current_target = new_target
-            print(f"✅ Target set to: @{current_target}")
+            print(f" Target set to: @{current_target}")
         else:
-            print("❌ Invalid username.")
+            print(" Invalid username.")
+
+    elif cmd == "proxy":
+        use_proxies = not use_proxies
+        print(f" Proxy usage is now {'ENABLED' if use_proxies else 'DISABLED'}.")
 
     elif cmd == "exit":
-        print("👋 Exiting bot.")
+        print("Exiting bot.....")
         break
 
     else:
-        print("❓ Unknown command. Try 'send', 'auto', 'target', or 'exit'.")
-#enjoy ts ;)
+        print("❓ Unknown command. Try send | auto | threaded | target | proxy | exit")
+#enjoy this friend =)
