@@ -8,12 +8,13 @@ A simple Python bot that sends anonymous LeBron admiration messages through NGL 
 
 ## ⚙️ Features
 
-- 👑 Auto-generates LeBron praise questions
-- 🔁 Loop auto-send with delays
-- 🎯 Change the NGL target anytime
-- 📡 Handles rate limits (429 responses)
-- 💬 Interactive terminal commands
-
+-  Auto-generates LeBron praise questions
+-  Loop auto-send with delays
+-  Change the NGL target anytime
+-  Handles rate limits 
+-  Interactive terminal commands
+-  Proxy support
+-  Threaded mode
 ---
 
 ## 📦 Requirements
